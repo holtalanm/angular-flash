@@ -120,9 +120,22 @@ app.factory('Flash', [
                 }
             }
         };
+        //Private dismiss function used by the dataFactory.clear function.
+        //It excludes $digest call to prevent angular error.
+        function clearDismiss(id) {
+            const index = findIndexById(id);
+            if (index !== -1) {
+                const flash = $rootScope.flashes[index];
+                dataFactory.pause(index);
+                $rootScope.flashes.splice(index, 1);
+                if (typeof dataFactory.onDismiss === 'function') {
+                    dataFactory.onDismiss(flash);
+                }
+            }
+        };
         dataFactory.clear = function() {
             while ($rootScope.flashes.length > 0) {
-                dataFactory.dismiss($rootScope.flashes[0].id);
+                clearDismiss($rootScope.flashes[0].id);
             }
         };
         dataFactory.reset = dataFactory.clear;
